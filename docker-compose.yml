@@ -1,0 +1,18 @@
+services:
+  payments_ms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "payments_ms"
+    restart: always
+    ports:
+      - 3004:3004
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    command: bash -c "npm install --legacy-peer-deps && npm run build && npm start"
+
+networks:
+  default:
+    name: local
