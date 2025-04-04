@@ -1,6 +1,8 @@
 import { LoggerServiceInterface, LogLevel } from '@/domain/services/logger-service.interface'
 import pino, { Logger as PinoLogger } from 'pino'
 import { getNamespace } from 'cls-hooked'
+import * as fs from 'fs'
+import * as path from 'path'
 
 type LogData = {
   level: LogLevel
@@ -13,14 +15,38 @@ export class LoggerService implements LoggerServiceInterface {
   private readonly logger: PinoLogger
 
   constructor () {
-    this.logger = pino({
-      transport: {
-        target: 'pino-pretty',
-        options: {
-          colorize: true
-        }
+    const logDirectory = path.resolve(__dirname, '../../../app-logs')
+    if (!fs.existsSync(logDirectory)) {
+      fs.mkdirSync(logDirectory, { recursive: true })
+    }
+
+    const logFilePath = path.join(logDirectory, 'payments-ms.log')
+
+    const streams = [
+      {
+        stream: pino.transport({
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            translateTime: 'SYS:standard',
+            ignore: 'message'
+          }
+        })
+      },
+      {
+        stream: fs.createWriteStream(logFilePath, { flags: 'a' })
       }
-    })
+    ]
+
+    const appName = 'payments-ms'
+    this.logger = pino(
+      {
+        level: 'info',
+        name: appName,
+        base: { appName }
+      },
+      pino.multistream(streams)
+    )
   }
 
   private logWithTracking (level: LogLevel, message: string, obj?: object): void {
