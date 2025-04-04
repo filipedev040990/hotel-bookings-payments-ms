@@ -6,7 +6,6 @@ import * as path from 'path'
 
 type LogData = {
   level: LogLevel
-  message: string
   requestId?: string
   [key: string]: any
 }
@@ -53,7 +52,7 @@ export class LoggerService implements LoggerServiceInterface {
     const requestId = getNamespace('requestContext')?.get('requestId')
     const additionalInfo = { requestId, ...obj }
 
-    const logObject: LogData = { level, message, ...additionalInfo }
+    const logObject: LogData = { level, ...additionalInfo }
 
     switch (level) {
       case LogLevel.INFO:
