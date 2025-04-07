@@ -37,18 +37,22 @@ export class LoggerService implements LoggerServiceInterface {
       }
     ]
 
-    const appName = 'payments-ms'
     this.logger = pino(
       {
         level: 'info',
-        name: appName,
-        base: { appName }
+        name: 'payments-ms',
+        base: {}
       },
       pino.multistream(streams)
     )
   }
 
   private logWithTracking (level: LogLevel, message: string, obj?: object): void {
+    const logLevel: LogLevel = level
+    if(logLevel === LogLevel.DEBUG) {
+      return
+    }
+
     const requestId = getNamespace('requestContext')?.get('requestId')
     const additionalInfo = { requestId, ...obj }
 
