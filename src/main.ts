@@ -29,12 +29,11 @@ async function init () {
         loggerService.error('Error parsing message', { message, parseError })
         return
       }
-      //{"status":"confirmed","id":"745adbc5-d74b-48b4-a745-7cd3c4b5e13d","roomId":"008d0715-8144-41fd-aabb-3837511ff857"}
       const isPaid = Math.random() < 0.5
 
       const roomId = data.roomId
       const id = data.id
-      const status = isPaid ? 'confirmed': 'refused'
+      const status = isPaid ? 'confirmed' : 'refused'
 
       const channelToPublish = id
       const messageToPublish = JSON.stringify({
@@ -46,10 +45,7 @@ async function init () {
       setTimeout(async () => {
         await pubSubService.publish(channelToPublish, messageToPublish)
         loggerService.info('Published message success', { channelToPublish, messageToPublish })
-      }, 30000);
-
-
-
+      }, 30000)
     } catch (error) {
       loggerService.error('Error processing payment', { error })
     }
@@ -57,8 +53,7 @@ async function init () {
 
   const port = process.env.PORT ?? 3000
 
-  app.listen(port, () => loggerService.info(`Server running at port ${port}`))
+  app.listen(port, () => loggerService.info(`Bootstrap ok! Server running at port ${port}`))
 }
-
 
 void init()
