@@ -1,0 +1,31 @@
+name: AWS Deploy
+
+on:
+  workflow_dispatch:  # 👈 Isso ativa o botão manual
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm i --loglevel verbose -f --legacy-peer-deps
+      
+      - name: Test
+        run: npm run test
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/projects/hotel-bookings-payments-ms/
+            git fetch --all > /dev/null 2>&1
+            git reset --hard origin/main
+            docker compose down
+            docker compose up -d
